@@ -1,0 +1,631 @@
+\documentclass[uplatex]{jsreport}
+\usepackage{octopus}
+\NewDocumentCommand{\TikZ}{}{Ti\textit{k}Z}
+\NewDocumentCommand{\Cname}{m}{\texttt{\textbackslash #1}}
+\NewDocumentCommand{\Ename}{m}{\texttt{#1}環境}
+\NewDocumentCommand{\Pname}{mo}{\texttt{#1}パッケージ\IfValueT{#2}{の\texttt{#2}オプション}}
+
+\begin{document}
+\fulltitle{各種コマンドの表示一覧}{第1版; 2020.07.30}
+\minititle{各種コマンドの表示一覧}{第1版; 2020.07.30}
+\section*{はじめに}
+この文書は主に「octopus.sty」\footnote{私のgithubの別のレポジトリの中にも同名のファイルがありますが，中身は若干異なります．}\,と「octopuscommand.sty」によって利用が可能なコマンドや環境についてその機能の明瞭化のために出力例を提示する目的で作成されました．本来は「octopus-kanbun.sty」や「octopusbeamer.sty」\footnote{ハイフンの有無が統一されていないのは気分の問題でしょう．}\,で定義されているコマンドや機能についても実例を示すべきですが，前者については既に実例が文献\cite{oct-kanbun}にあるため\footnote{なぜか実例だけ2年近く前に上がっているという怪奇現象が起きています．}，後者については「octopus.sty」との違いがほとんどない\footnote{具体的には，Beamerを使うにあたって用紙設定を変更しているだけです．}\,ため本文書では割愛します．\par
+\sukima
+私がこのstyファイルを公開した理由は2つあります．\par
+1点目には，Twitterでアンケートを取ったら「公開しても良いんじゃないか」ということだったからです\footnote{「いつだって人は困ったら他人に意見を聞くものです．今回の私の場合はそれが偶然Twitterだっただけで，別にいつもTwitterに身を委ねているわけではありません．」と，本人は主張しています．}．\par
+そして2点目が，公開することが，自分も含め，誰かの利益になるのではないかと考えたからです．例えば「octopuscommand.sty」では集合を出力するコマンドとして\Cname{set}が定義されています．これは適切に式の部分を入力すれば
+\begin{align}\label{eq:0.1}
+  \set{\bm{x} \in \setR^{m}}[%
+    \sum_{i=1}^{m} \bm{1}^{\top} \bm{x} = 1, \; \bm{x} \ge \bm{0}%
+  ]%
+\end{align}
+のように出力するコマンドです．大事なのは最も外側の括弧と途中で引かれている縦線の長さが式の高さに合わせて長くなっていることです．世の中にはこの部分をちょろまかして
+\begin{align}
+  \{ \bm{x} \in \setR^{m} | \sum_{i=1}^{m} \bm{1}^{\top} \bm{x} = 1, \; \bm{x} \ge \bm{0} \}
+\end{align}
+と出力している文書があります．これはとても見た目が汚いと思います\footnote{あくまで個人の感想です．}．あくまで個人の意見として，私は式\eqref{eq:0.1}のように記述すべきだと思います．しかし，文書を執筆する際にいちいち式の見た目を気にしていたのでは作業が進みません．何より文書の執筆中には文書の「内容」に専念すべきです．\par
+そこでコマンドの出番です．コマンドで式\eqref{eq:0.1}のようなフォーマットを整えてしまえば，後はそれを呼び出すだけで気軽に整った見た目の文書を書き上げられます．とはいえ，コマンドの定義は面倒です．大多数の人は{\LaTeX}のコマンド作成よりも，大事なことがあって，例えば，勉強・研究・仕事・バイト・なぜか機嫌が悪い恋人の機嫌取りなど，タスクが山積している人にはそんなことをやっている時間はないかもしれません．そこで，私は拙作のstyファイルがこのような忙しい現代人のために\footnote{というと凄く偉そうなことをしているみたいですが，実際は既成の拙作styファイルに長たらしい説明文を付けただけです．}\,なればと思い公開に踏み切りました．
+\par
+\sukima
+なお，このstyファイルはあくまで参考程度に上げたものなので，念入りにバグを調査したというわけではありません．ただ，私が普段使いしているものとほぼ同じですので，これだけを使った場合に不具合が出ることはないとは思います．しかし，「コマンドをそのまま自分のファイルにコピーしたら，コマンド名が衝突してうまくいかなかった」という可能性もありますのでご注意ください．また，何かご不明な点や不可解な点，あるいはその他にも「\textbf{こんないいパッケージがあるぞ}」という情報等がございましたらお気軽にト部蛸焼 (Twitterアカウント: @tobetakoyaki) までご連絡くださると嬉しいです．
+\par
+\tableofcontents
+\newpage
+\chapter{パッケージ篇}
+この章では「octopus.sty」で呼び出しているパッケージを紹介します．具体的な効果や取り扱いについてはそれぞれに付してある参考文献をご参照ください．
+\section{全体に関わるもの}
+\paragraph{geometry} これは文書を出力する用紙の余白を設定するために利用しています\cite{geometry}．
+\paragraph{xparse} これはコマンド定義の幅を簡単に広げられるように導入したものです．if文を使った処理を比較的容易にできるので重宝しています\cite{xparse}．
+\paragraph{url} URLを挿入するのに便利です．以上です\cite{url}．
+\paragraph{hyperref・pxjahyper} 「みんな大好きハイパーリンクを私も入れてみました！」な部分です．宝の持ち腐れになっています\cite{hyperref, pxjahyper}\footnote{この文書を作成する前に一度使ったきりだったので，この文書ではハイパーリンクを利用してみました．なお，やたら派手な着色をされると目がチカチカするので，文献へのリンク以外はリンク色を黒に設定したつもりです．}．
+
+\section{数式のフォント}
+\paragraph{amsmath・amssymb・amsfonts} 必須です．数学に関する文書でよく用いられる記号がいろいろと定義されているので，入れておいて損はないと思います\cite{amsmath,amsfonts}．記号に関連して，手書きで入力した数学記号をどのパッケージのどのコマンドで入力できるかを教えてくれる「Detexify」というサイト\cite{Detexify}\,を共有します．便利です．
+\paragraph{bm} ベクトル太字を出力しやすくします．\subjref{table:0.bm}{表}には英字アルファベットの太字バージョンを出力しましたが，その他にもいろいろな記号の太字バージョンを出力できます\cite{bm}．\par
+\begin{table}[htbp]
+  \centering
+  \caption{\Pname{bm}によるベクトル太字の出力}
+  \label{table:0.bm}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$\bm{a}$| & $\bm{a}$ \\
+    \verb|$\bm{b}$| & $\bm{b}$ \\
+    \verb|$\bm{c}$| & $\bm{c}$ \\
+    \verb|$\bm{d}$| & $\bm{d}$ \\
+    \verb|$\bm{e}$| & $\bm{e}$ \\
+    \verb|$\bm{f}$| & $\bm{f}$ \\\hline
+  \end{tabular}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$\bm{g}$| & $\bm{g}$ \\
+    \verb|$\bm{h}$| & $\bm{h}$ \\
+    \verb|$\bm{i}$| & $\bm{i}$ \\
+    \verb|$\bm{j}$| & $\bm{j}$ \\
+    \verb|$\bm{k}$| & $\bm{k}$ \\\\\hline
+  \end{tabular}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$\bm{l}$| & $\bm{l}$ \\
+    \verb|$\bm{m}$| & $\bm{m}$ \\
+    \verb|$\bm{n}$| & $\bm{n}$ \\
+    \verb|$\bm{o}$| & $\bm{o}$ \\
+    \verb|$\bm{p}$| & $\bm{p}$ \\\\\hline
+  \end{tabular}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$\bm{q}$| & $\bm{q}$ \\
+    \verb|$\bm{r}$| & $\bm{r}$ \\
+    \verb|$\bm{s}$| & $\bm{s}$ \\
+    \verb|$\bm{t}$| & $\bm{t}$ \\
+    \verb|$\bm{u}$| & $\bm{u}$ \\\\\hline
+  \end{tabular}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$\bm{v}$| & $\bm{v}$ \\
+    \verb|$\bm{w}$| & $\bm{w}$ \\
+    \verb|$\bm{x}$| & $\bm{x}$ \\
+    \verb|$\bm{y}$| & $\bm{y}$ \\
+    \verb|$\bm{z}$| & $\bm{z}$ \\\\\hline
+  \end{tabular}
+\end{table}\par
+
+\section{枠・図・表}
+\paragraph{fancybox・ascmac} 枠の出力の便宜を図るパッケージです\cite{fancybox,ascmac}．
+\paragraph{graphicx} 特に図や写真を挿入するときに有用です\cite{graphicx}．
+\paragraph{xcolor} テキストの着色に有用です\cite{xcolor}．
+\paragraph{tikz} {\TikZ}を使えるようにします．これを使うあなたも{\TikZ}を使えるようにします\cite{pgf}\footnote{このリンクの先にある「PGF Manual」というpdfはTikZとpgfに関して困ったことがあれば必ず助けてくれるマニュアルです．非常にページ数が多いので読破には向かないと思いますが．}．この部分ではcalc，positioning，shapes.calloutsという3つのTikZのライブラリーを呼び出しています．それぞれ，大雑把にいえば，座標の計算をできるようにするもの，点の位置について微調整できるようにするもの，吹き出し (cf. \ref{section:highlight-callout}章) を作れるようにするものです．
+% \usetikzlibrary{calc}
+% \usetikzlibrary{positioning} % 吹き出しに必要
+% \usetikzlibrary{shapes.callouts} % 吹き出しに必要
+\paragraph{mdframed} {\TikZ}の呼び出しの後に呼び出すことがポイントです\cite{mdframed}．
+\paragraph{pxpgfmark} 文献\cite{pxpgfmark}を参照．
+\paragraph{array・booktabs} 表の使い勝手を良くするものです\cite{array,booktabs}．
+\paragraph{multirow} これがあると表の縦方向の連結ができます\cite{multirow}．
+
+\section{定理の記述}
+\paragraph{amsthm} 非常に有名な定理を記述するための代物です\cite{amsthm}．(cf. \ref{section:amsthm}章)
+
+\section{図表のキャプションの便宜}
+\paragraph{caption} 次項のアルゴリズム記述環境のために導入しています．キャプションをいい感じに操作できるようにします\cite{caption}．
+
+\section{アルゴリズムの記述}
+\paragraph{algorithm・algpseudocode} アルゴリズムの擬似コードを書くときに使えます\cite{algorithms,algorithmicx}．
+% \paragraph{}
+
+\section{octopuscommand}
+これは次の章以降で説明するコマンドを定義しているファイルになります．「octopus.sty」からこれを呼び出すことによって，執筆時の文書のプリアンブルでは「octopus.sty」だけを呼び出せばよいことになります\footnote{今回は説明を割愛していますが，「octopusbeamer.sty」でも同じように「octopuscommand.sty」を呼び出しています．なぜこのようにしているかというと，Beamer利用時との混乱を避けるためです．「octopus.sty」の特に用紙の余白設定の部分をBeamerファイルに適用するのはあまり良くないため，パッケージを呼び出す部分を「octopus.sty」と「octopusbeamer.sty」に分けることにしたのです．コマンドは大体同じものを定義するので，そこだけまとめています．}．
+
+\chapter{文章篇}
+\section{タイトル}
+\begin{table}[htbp]
+  \centering
+  \caption{フルページタイトルとミニタイトル}
+  \label{table:1.title}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|\fulltitle{各種コマンドの表示一覧}{第1版; 2020.07.25}| & (cf. 表紙) \\
+    \verb|\minititle{各種コマンドの表示一覧}{第1版; 2020.07.25}| & (cf. p. 1冒頭) \\ \hline
+  \end{tabular}
+\end{table}
+この文書の初めの用紙がそのまま\Cname{fulltitle}で出力されています．また，1ページ目の上部に表示されているものが\Cname{minititle}の出力です．\par
+コマンドの定義の目的は文書のタイトルと自分の名前などの情報を表示させることです．個人情報の保護のために公開しているstyファイルでは異なる情報を載せていますが，本来，「ト部蛸焼 (@tobetakoyaki)」となっている部分には所属や氏名などの情報が予め入力されています．\par
+
+\section{本文装飾}
+ここではテキストの着色に関するコマンドを紹介します．\par
+\begin{table}[htbp]
+  \centering
+  \caption{テキストの着色}
+  \label{table:1.coloring}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|\textred{赤}色| & \textred{赤}色 \\
+    \verb|\textblue{青}色| & \textblue{青}色 \\
+    \verb|\textgreen{緑}色| & \textgreen{緑}色 \\
+    \verb|\textorange{橙}色| & \textorange{橙}色 \\\hline
+  \end{tabular}
+\end{table}\par
+\Pname{xcolor}に\Cname{textcolor}というコマンドがありますが，これを呼び出しやすくしただけです．緑とオレンジは単純なgreenとorangeではなく，\Pname{xcolor}[x11names]で定義できるGreen4とDarkOrange1をそれぞれ用いています\footnote{cf. \url{https://www.ctan.org/pkg/xcolor}にあるパッケージ文書．途中のページに色見本があります．}．これは見やすさを考えての結果です\footnote{しかしながら，これが最良とは限らないと思います．}．\par
+
+\section{見出し}
+\begin{table}[htbp]
+  \centering
+  \caption{見出しと大見出し}
+  \label{table:1.midashi}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|\omidashi{公開鍵暗号方式}| & (cf. \subjref{fig:1.midashi}{図}) \\
+    \verb|\midashi{鍵生成アルゴリズム}| & (cf. \subjref{fig:1.midashi}{図}) \\\hline
+  \end{tabular}
+\end{table}\par
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}{0.75\columnwidth}
+  \omidashi{公開鍵暗号方式}
+  \nw{公開鍵暗号}[public key encryption]は\nw{鍵生成}[key generation]と\nw{暗号化}[encryption]と\nw{復号}[decryption]の3つから構成される．
+  \sukima
+  \midashi{鍵生成}
+  安全性の指標となるセキュリティパラメータ$\kappa$に従って，公開鍵$\mathsf{pk}$と秘密鍵$\mathsf{sk}$を生成する．公開鍵はその名の通り一般に公開し，秘密鍵は復号する者だけが秘密裏に保持する．
+  \end{minipage}
+  \caption{見出しと大見出しの出力例}
+  \label{fig:1.midashi}
+\end{figure}\par
+
+\Cname{omidashi}と\Cname{midashi}は大見出しと見出しを出力するために作りました．後になって\Cname{paragraph}と\Cname{subparagraph}を知ったので今はあまり使っていません．ちなみに\subjref{fig:1.midashi}{図}の「鍵生成」の前の改行は\Cname{midashi}によって挿入されたもの\textbf{ではありません}．
+
+\section{新語}
+\Cname{nw}は講義ノートやシケプリ\footnote{今となってはこの単語が懐かしい......}\,の製作時に頻用しています．元は上記内容のpdfを製作するときに，新出の単語を強調するために定義したものなので，「new words」の頭文字を取って命名しています．\par
+製作後，幾度の改良を経て，現在は括弧書きで追加情報を選択的に付記できるようにしています．強調される語は前後と間隔が空くように設定しています\footnote{コマンド定義ではこの間隔を半角空白で実現していますが，これはあまり良くない気がしています．}．\par
+\begin{table}[htbp]
+  \centering
+  \caption{語の強調と簡易注釈}
+  \label{table:1.newwords}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|これが\nw{Euclid整域}である．| & これが\nw{Euclid整域}である．\\
+    \verb|これは\nw{整域}[domain]という．| & これは\nw{整域}[domain]という．\\\hline
+  \end{tabular}
+\end{table}\par
+
+\section{1行分の隙間}
+\Cname{sukima}は\verb|\vspace{\baselineskip}|に同じで1行分の隙間を出力します．
+\subjref{fig:1.midashi}{図}の「鍵生成」の前にある1行分の隙間は\Cname{sukima}によって出力されています．\par
+
+\section{定理環境と参照}\label{section:amsthm}
+「octopus.sty」では\Pname{amsthm}と\Pname{mdframed}を用いて定理環境を出力しています．:\par
+\begin{verbatim}
+  27: \usepackage{amsthm}
+  28: \theoremstyle{definition}
+  29: \newtheorem{theo}{定理}[section]
+  30: \newtheorem{defi}[theo]{定義}
+  31: \newtheorem{lem}[theo]{補題}
+  32: \newtheorem{prop}[theo]{命題}
+  33: \newtheorem{cor}[theo]{系}
+  34: \newtheorem{exam}[theo]{例}
+  35: \renewcommand{\proofname}{\textsf{証明}}
+  36: \surroundwithmdframed[innertopmargin=0pt]{defi}
+  37: \surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{theo}
+  38: \surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{lem}
+  39: \surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{prop}
+  40: \surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{cor}
+\end{verbatim}
+\par
+上記のコードの説明をします．\Cname{theoremstyle}で\texttt{definition}を選択することが日本語で定理を記述する際の常套手段です\footnote{事前にこのように定義しているので，英語のレポートには使うのはあまりよろしくないのかもしれませんが，普通に使っています．}．\Cname{newtheorem}で定理環境等を整えています．セクションを跨ぐごとに番号をリセットし (29行目)，「定理」「定義」「補題」「命題」「系」「例」をすべて同じ通し番号で管理させ (30--34行目)，「証明」をちゃんとさせています (35行目)．また，36--40行目では，定義を四角い枠で，定理・補題・命題・系を角丸な四角い枠で囲むように設定しています．代表して定義環境と定理環境だけを出力してみます．
+\par
+\sukima
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.75\columnwidth}
+    \sukima . \vspace{-\baselineskip}
+    \begin{defi}\label{def:additiveSS}
+      $m \in M$を秘密値とする．2人のプレイヤー$\mathsf{P}_1$と$\mathsf{P}_2$を考える．乱数$r \in \mathbb{Z}$を選び，シェアとして$\mathsf{P}_1$に$m - r$, $\mathsf{P}_2$に$r$を渡す秘密分散法を\nw{$(2,2)$-加法的秘密分散}[additive secret sharing]という．
+    \end{defi}
+    \begin{theo}
+      $(2,2)$-加法的秘密分散は，攻撃者が結託をしない場合には安全な秘密分散方式である．
+    \end{theo}
+    \begin{proof}
+      読者の演習とする．
+    \end{proof}
+  \end{minipage}
+  \caption{定義環境と定理環境の出力}
+  \label{fig:1.defi-and-theo}
+\end{figure}
+\par
+更に，「octopuscommand.sty」では定理番号や図表番号を参照するために，\Cname{subjref}というコマンドを定義しています．わざわざ「\textbf{定義}」と手動で太字にするのが面倒なのでまとめただけです．引数の順番が「1. refに渡すラベル名」「2. 定義などの項目」である理由は，使っているエディタ\footnote{vscodeです．}\,のサジェスト機能に巧く対応させるためです．
+\par
+\begin{table}[h]
+  \centering
+  \caption{項目付き参照}
+  \label{table:1.subjref}
+  \begin{tabular}{ll} \hline
+    入力例 & 表示例 \\ \hline
+    \verb|\subjref{def:additiveSS}{定義}によると，| & \subjref{def:additiveSS}{定義}によると， \\\hline
+  \end{tabular}
+\end{table}
+\par
+この文書では\subjref{fig:1.defi-and-theo}{図}内にある\subjref{def:additiveSS}{定義}に「def:additiveSS」というラベルが付けてあるので，\subjref{table:1.subjref}{表}のようにして番号を参照できています．
+\par
+\section{ハイライトと吹き出し}\label{section:highlight-callout}
+文章中にハイライトを付けたり，吹き出しを付けたりします．こちらは文献\cite{soma}を基盤に，一部に改変を加えています．
+これらの機能は主にBeamerを使ってスライド発表をするときに活用できるかと思います．\par
+\Cname{highlight}の基本形は以下の通りです．\par
+\begin{mdframed}[frametitle={基本形}, roundcorner=10pt, backgroundcolor=blue!10]
+  \texttt{\textbackslash highlight[色名]\{被ハイライト文字列\}[キャプション]}
+\end{mdframed}
+
+\begin{table}[htbp]
+  \centering
+  \caption{ハイライト}
+  \label{table:1.highlight}
+  \begin{tabular}{ll} \hline
+    入力例 & 表示例 \\ \hline
+    \verb|\highlight{りんご}| & \highlight{りんご}\\
+    \verb|\highlight[Green4]{青りんご}| & \highlight[Green4]{青りんご}\\
+    \verb|\highlight{りんご}[バナナ]| & \highlight{りんご}[バナナ]\\\hline
+  \end{tabular}
+\end{table}\par
+
+\subjref{table:1.highlight}では通常のテキストに対してハイライトやキャプションを加えているのみですが，少々高さがある数式に対しても適切にハイライトやキャプションを加えることが可能です (\subjref{fig:1.highlightforbig}{図})．
+\par\sukima
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}{0.75\columnwidth}
+    少々コードが複雑になるものの，数式に対してもハイライトして説明を加えることが可能である．
+    \begin{center}
+      $\left\langle \bm{v},\;\Enc(\bm{e}_{k}) \right\rangle = \highlight{${\displaystyle \bigoplus_{i=0}^{\len(v)} v[i] \otimes \Enc(\delta_{i,k})}$}[暗号文の加法] = \Enc(v[k])$
+    \end{center}
+    また，吹き出しを作って補足説明を行うことも可能．\par
+    これは\calloutset{p}{スライド}だと効果的だがドキュメントだと字が被って見えなくなるだけなので使い勝手が悪いかもしれない．
+    \calloutwrite{p}{Beamerで作る}
+  \end{minipage}
+  \caption{巨大数式のハイライトと吹き出し}
+  \label{fig:1.highlightforbig}
+\end{figure}
+\par\sukima
+吹き出し機能は，吹き出しを入れて説明したい文字列 (被説明文字列) に名前を付ける\Cname{calloutset}と吹き出しの内容となる文字列 (説明文字列) を入力する\Cname{calloutwrite}に分けています．被説明文字列と説明文字列のコマンドを分けるのは，スライドで発表をしているときに，後から吹き出し部分を表示させて説明するということを実現するためです．
+\par
+\Cname{calloutset}と\Cname{calloutwrite}の基本形は以下の通りです．
+\par
+\begin{mdframed}[frametitle={基本形}, roundcorner=10pt, backgroundcolor=blue!10]
+  \texttt{\textbackslash calloutset\{吹き出しの識別名\}\{被説明文字列\}}\par
+  \noindent\texttt{\textbackslash calloutwrite\{吹き出しの識別名\}\{説明文字列\}}\par
+\end{mdframed}
+\par
+\begin{table}[htbp]
+  \centering
+  \caption{吹き出し}
+  \label{table:1.callout}
+  \begin{tabular}{p{25em}l} \hline
+    入力例 & 表示例 \\ \hline
+    これは\verb|\calloutset{p}{スライド}|だと効果的だがドキュメントだと字が被って見えなくなるだけなので使い勝手が悪いかもしれない．\verb|\calloutwrite{p}{Beamerで作る}| & (cf. \subjref{fig:1.highlightforbig}{図})\\\hline
+  \end{tabular}
+\end{table}
+\par
+
+\section{\TikZ}
+{\TikZ}で使えそうと思ったコマンドを数個だけ定義しています．
+\Cname{midwayarrow}は中間矢印付きの線分を描きます．
+\begin{mdframed}[frametitle={基本形}, roundcorner=10pt, backgroundcolor=blue!10]
+  \texttt{\textbackslash midwayarrow[線色（未指定の場合は黒）]\{(1点目の座標)\}\{(2点目の座標)\}}
+\end{mdframed}
+で，1点目から2点目に線分を引き，だいたい中間位置に矢印が付きます\footnote{ここは改良点が見えたので改良していきたいです．}．
+\par
+また，中黒の点を描きたいときのために\Cname{point}を定義してあります．基本形は以下の通りです．
+\begin{mdframed}[frametitle={基本形}, roundcorner=10pt, backgroundcolor=blue!10]
+  \texttt{\textbackslash filldraw \textbackslash point\{(点の座標)\}\{文字位置\}\{文字内容\}}
+\end{mdframed}
+このコマンドは以下のように定義してあるので，
+\begin{verbatim}
+\filldraw \point{(0,0)}{below}{A} \point{(6,0)}{above}{B}
+\end{verbatim}
+のように複数の点を連続して設定することが可能です．:
+\begin{verbatim}
+  68: \newcommand{\point}[3]{% 名前付き点 \point{(点の座標)}{文字の位置}{文字内容}
+  69:   #1 node[#2]{#3} circle [radius=0.05]
+  70: }%  
+\end{verbatim}
+\par
+\begin{table}[htbp]
+  \centering
+  \caption{中間矢印付き線分・点描画}
+  \label{table:1.TikZ}
+  \begin{tabular}{ll} \hline
+    入力例 & 表示例 \\ \hline
+    \verb|\midwayarrow{(0,0)}{(6,0)}| & (cf. \subjref{fig:1.TikZ}{図})\\
+    \verb|\filldraw \point{(0,0)}{below}{A} \point{(6,0)}{above}{B};| & (cf. \subjref{fig:1.TikZ}{図})\\ \hline
+  \end{tabular}
+\end{table}
+\par
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \midwayarrow{(0,0)}{(6,0)}
+    \filldraw \point{(0,0)}{below}{A} \point{(6,0)}{above}{B};
+  \end{tikzpicture}
+  \caption{中間矢印付き線分・点描画}
+  \label{fig:1.TikZ}
+\end{figure}
+
+\chapter{数式篇}
+\section{定数}
+\begin{table}[htbp]
+  \centering
+  \caption{定数}
+  \label{table:2.const}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$\conste^{\consti \constpi} = -1$| & $\conste^{\consti \constpi} = -1$\\
+    \verb|$e^{i \pi} = -1$| & $e^{i \pi} = -1$ \\\hline
+  \end{tabular}
+\end{table}\par
+立体にする定数を定義しています．数学的な定数はしばしば斜体ではなく立体で書かれます．これはいくつかの基準ではNapier数や虚数単位\footnote{私は$\consti$を用いていますが，各基準では$\mathrm{j}$も虚数単位として並んで書かれています．どちらを用いても問題はありません．}\,，円周率のような定数を立体で書くものとして規定しているためです\cite{ISO80000-2,JISZ8201,nihonbutsuri}．ただ，正直，定数に関してはどちらでも構わないと思います．しかし，例えば，対数関数を$log\;x$のように書くと，街中で急に後ろから頭を殴打される可能性がありますのでご注意ください\footnote{もちろん$\log x$のように書いてもそのような可能性があることには変わりませんが．}．\Cname{conste}と\Cname{consti}はたまに使いますが，\Cname{constpi}はほぼ使っていません．これは私の環境では$\pi$と$\constpi$の違いが分からないためです．
+\par
+\section{集合}
+\paragraph{一般の集合} \Cname{set}は一般の集合を記述するためのコマンドです．\par
+\begin{mdframed}[frametitle={基本形}, roundcorner=10pt, backgroundcolor=blue!10]
+  \texttt{\textbackslash set\{対象\}[条件式]}
+\end{mdframed}
+\subjref{table:2.set1}{表}に入出力例を挙げます．\par
+\begin{table}[htbp]
+  \centering
+  \caption{集合(1): 一般の集合}
+  \label{table:2.set1}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$[n]:=\set{1,\dots,n}$| & $[n]:=\set{1,\dots,n}$\\
+    \verb|$\set{x \in R}[\exists y \in R,\; xy = 0]$| & $\set{x \in R}[\exists y \in R,\; xy = 0]$ \\\hline
+  \end{tabular}
+\end{table}\par
+条件式は\Cname{aligned}の中に挿入されるので，「改行」することが可能です．
+\begin{align*}
+  \set{x \in \mathbb{Z}}[{%
+    &F(x) \equiv 0 \pmod{3},\\%
+    &F(x) \equiv 0 \pmod{5}.\\%
+  }]%
+\end{align*}
+なお，オプション引数として「\verb|&|」を使うときには次のように全体を\verb|{ }|でグルーピングする必要があります\footnote{このあとの確率と期待値のコマンドについても同様です．}．
+\begin{verbatim}
+\set{x \in \mathbb{Z}}[{%
+  &F(x) \equiv 0 \pmod{3},\\%
+  &F(x) \equiv 0 \pmod{5}.\\%
+}]%
+\end{verbatim}
+\par
+\paragraph{特別な集合} 自然数全体の集合や整数全体の集合などを出力するコマンドです．この部分の作成は文献\cite{gfngfn-set}から引用しています．\par
+文献\cite{gfngfn-set}では自然数全体を表す集合などを$\mathbb{N}, \mathbb{Z}$と記法するパターンと$\mathbf{N}, \mathbf{Z}$と記法するパターンが存在することを指摘しています．そして，それらの双方に (ほぼ) 同一のコマンド入力で対応できるようなコマンド定義の方法を説明しています．\par
+現在，私は$\mathbb{N}, \mathbb{Z}$と記入する流儀に属している\footnote{単に好みで使っているだけで本当は「流儀」と呼ぶまでに深い意味はありません．}\,ので，初めから\Cname{usebbset}と宣言して使用しています．あまりないと思いますが，臨時で記法を変更したい場合でも\Cname{usebfset}と宣言すれば記法が変更できます\footnote{\subjref{table:2.set2}{表}内では毎回この宣言をしていますが，これは表の中で巧くこの機能が働いていなかったためです．本来の使用状況では一つのドキュメントの中で記法を激しく変更する必要はないと思いますので，冒頭で一回宣言をすれば十分です．}．
+\begin{table}[htbp]
+  \centering
+  \caption{集合(2): 特別な集合}
+  \label{table:2.set2}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|\usebbset $\setC,\setF,\setH,\setN,\setP,\setQ,\setR,\setZ$| & \usebbset$\setC,\setF,\setH,\setN,\setP,\setQ,\setR,\setZ$\\
+    \verb|\usebbset $\setF[2], \setN[>0], \setQ[<a], \setR[\ge 0], \setZ[2]$| & \usebbset $\setF[2], \setN[>0], \setQ[<a], \setR[\ge 0], \setZ[2]$\\
+    \verb|\usebfset $\setC,\setF,\setH,\setN,\setP,\setQ,\setR,\setZ$| & \usebfset $\setC,\setF,\setH,\setN,\setP,\setQ,\setR,\setZ$\\
+    \verb|\usebfset $\setF[2], \setN[>0], \setQ[<a], \setR[\ge 0], \setZ[2]$| & \usebfset $\setF[2], \setN[>0], \setQ[<a], \setR[\ge 0], \setZ[2]$\\\hline
+  \end{tabular}
+\end{table}\par
+
+\section{写像や演算子} % definesはここに
+\paragraph{写像・演算子(1)} 一通り使いそうなものを定義してあります．演算子扱いになるものは\Pname{amsmath}の\Cname{DeclareMathOperator}で定義をしています．
+\par
+\begin{table}[htbp]
+  \centering
+  \caption{写像・演算子(1)}
+  \label{table:2.operaor1}
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline 
+    \verb|$\abs{x} + \abs{\dfrac{y + z}{2}}$| & $\abs{x} + \abs{\dfrac{y + z}{2}}$ \\
+    \verb|$\ceiling{x} + \ceiling{\dfrac{y + z}{2}}$| & $\ceiling{x} + \ceiling{\dfrac{y + z}{2}}$ \\
+    \verb|$\floor{x} + \floor{\dfrac{y + z}{2}}$| & $\floor{x} + \floor{\dfrac{y + z}{2}}$ \\
+    \verb|$\innerproduct{x}{\dfrac{y + z}{2}}$| & $\innerproduct{x}{\dfrac{y + z}{2}}$ \\
+    \verb|$\norm{x} + \norm{\dfrac{y + z}{2}}$| & $\norm{x} + \norm{\dfrac{y + z}{2}}$ \\
+    \verb|$x \sim y \defines x - y \in I$|& $x \sim y \defines x - y \in I$ \\
+    \verb|$x \randchosen[U] \setN$| & $x \randchosen[U] \setN$ \\
+    \verb|$y \randchosen \mathcal{A}(x)$| & $y \randchosen \mathcal{A}(x)$ \\\hline
+  \end{tabular}\par
+\end{table}\par
+\begin{table}[htbp]
+  \centering
+  \caption{写像・演算子(2)}
+  \label{table:2.operaor1.2}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline 
+    \verb|$\conv(S)$| & $\conv(S)$ \\
+    \verb|$\diag(a_1,\dots,a_n)$| & $\diag(a_1,\dots,a_n)$ \\
+    \verb|$\Dec(c)$| & $\Dec(c)$ \\
+    \verb|$\Enc(m)$| & $\Enc(m)$ \\
+    \verb|$\GL_n(\setR)$| & $\GL_n(\setR)$ \\
+    \verb|$\Image(f)$| & $\Image(f)$ \\
+    \verb|$\Kernel(f)$| & $\Kernel(f)$ \\
+    \verb|$\len(\ell)$| & $\len(\ell)$ \\
+    \verb|$\Map(X,Y)$| & $\Map(X,Y)$ \\
+    \verb|$\ord(G)$| & $\ord(G)$ \\
+    \verb|$\ordO(n)$| & $\ordO(n)$ \\
+    \verb|$\ordo(n \log n)$| & $\ordo(n \log n)$ \\
+    \verb|$\ordOtilde((\log n)^6)$| & $\ordOtilde((\log n)^6)$ \\
+    \verb|$\ordTheta(n^2)$| & $\ordTheta(n^2)$ \\
+    \verb|$\ordtheta(n^3)$| & $\ordtheta(n^3)$ \\
+    \verb|$\ordOmega(n^4)$| & $\ordOmega(n^4)$ \\
+    \verb|$\ordomega(n^5)$| & $\ordomega(n^5)$ \\
+    \verb|$\rank(A)$| & $\rank(A)$ \\
+    \verb|$\trace(A)$| & $\trace(A)$ \\
+    \verb|$\Trace(A)$| & $\Trace(A)$ \\\hline
+  \end{tabular}\par
+\end{table}\par
+\newpage
+\paragraph{写像・演算子(2)} 写像に関するコマンドです．よくノートや黒板で写像の定義を
+\begin{align*}
+  f \colon \mapdef{\setR}{\setR}{x}{%
+    {\displaystyle \sum_{i=0}^{n} a_i x^i}%
+  }
+\end{align*}
+のように図式らしく表記することがあります．これを\Cname{mapdef}は出力するためのコマンドです．引数が4つと多くて若干使いづらいです．
+\par
+\begin{table}[htbp]
+  \centering
+  \caption{写像・演算子(2)}
+  \label{table:2.operaor2}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \begin{tabular}{l} 
+    \verb|$f \colon \mapdef{\setR}{\setR}{x}{%| \\
+    \verb|  {\displaystyle \sum_{i=0}^{n} a_i x^i}%| \\
+    \verb|}$%|
+    \end{tabular} & $f \colon \mapdef{\setR}{\setR}{x}{{\displaystyle \sum_{i=0}^{n} a_i x^i}}$ \\
+    \verb|$\maprestrict{f}{\setR[>0]}$| & $\maprestrict{f}{\setR[>0]}$ \\ \hline
+  \end{tabular}\par
+\end{table}\par
+\newpage
+\section{解析ぽい}
+\begin{table}[htbp]
+  \centering
+  \caption{解析で使いそうな記号}
+  \label{table:2.vectlimit}
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$\vect{a} + \vect{\mathrm{AB}}$| & $\vect{a} + \vect{\mathrm{AB}}$ \\
+    \verb|$f(x) \limit{x \to \infty} 0$| & $f(x) \limit{x \to \infty} 0$ \\
+    \verb|$\odif{f}{x}, \odif{^2 f}{x^2}$| & $\odif{f}{x}, \odif{^2 f}{x^2}$ \\
+    \verb|$\pdif{f}{x}, \pdif{^2 f}{x^2}$| & $\pdif{f}{x}, \pdif{^2 f}{x^2}$ \\
+    \verb|$\pddif{f}{x}{y} = \pddif{f}{y}{x}$| & $\pddif{f}{x}{y} = \pddif{f}{y}{x}$ \\
+    \verb|${\displaystyle \int_{0}^{\infty} \conste^{-x^2} \dx{x}}$| & ${\displaystyle \int_{0}^{\infty} \conste^{-x^2} \dx{x}}$ \\
+    \verb|$\dxy{x}{y}$| & $\dxy{x}{y}$ \\
+    \verb|$\dxyz{x}{y}{z}$| & $\dxyz{x}{y}{z}$ \\ \hline
+  \end{tabular}\par
+\end{table}\par
+一時期だけ頻繁に使っていた矢線ベクトル・極限・微分・全微分・外積に関する記号を定義しています．全微分の記号は積分を表記するときにも用いています．\par
+微分や積分のときに使う$\dx{x}$の「d」をわざわざ立体にしていることがポイントです．
+\par
+\section{確率}
+\begin{table}[htbp]
+  \centering
+  \caption{確率と期待値}
+  \label{table:2.prob}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$\prob{X = 0}$| & $\prob{X = 0}$\\
+    \verb|$\prob[Z]{X = 0}[Y = y]$| & $\prob[Z]{X = 0}[Y = y]$\\
+    \verb|$\expe{X^2}$| & $\expe{X^2}$\\
+    \verb|$\expe[Z]{X^2}[Y = y]$| & $\expe[Z]{X^2}[Y = y]$\\\hline
+  \end{tabular}
+\end{table}\par
+\Cname{prob}は確率を表す記号$\Pr$を出力するコマンド\Cname{Pr}をベースに作成しています．\Cname{expe}についてはただの$E$を冠するのみです．期待値のつもりです．双方とも，「集合」のときと同じで，条件式は\Cname{aligned}の中に挿入されるので，「改行」することが可能です．
+\begin{align*}
+  \prob{m^{\prime} = m}[{%
+    &(\mathsf{pk}, \mathsf{sk}) \randchosen[R] \operatorname{\mathsf{Gen}}(1^{k}),\\
+    &m \in \mathcal{M},\\
+    &c \randchosen[R] \Enc(\mathsf{pk}, m),\\
+    &m^{\prime} := \Dec(\mathsf{sk},c)
+  }] = 1
+\end{align*}
+なお，これも「集合」のときと同じで，オプション引数として「\verb|&|」を使うときには次のように全体を\verb|{ }|でグルーピングする必要があります．
+\begin{verbatim}
+\prob{m^{\prime} = m}[{%
+  &(\mathsf{pk}, \mathsf{sk}) \randchosen[R] \operatorname{\mathsf{Gen}}(1^{k}),\\%
+  &m \in \mathcal{M},\\%
+  &c \randchosen[R] \Enc(\mathsf{pk}, m),\\%
+  &m^{\prime} := \Dec(\mathsf{sk},c)%
+}] = 1%
+\end{verbatim}
+\par
+\section{最適化}
+\begin{table}[htbp]
+  \centering
+  \caption{最適化のタブロー}
+  \label{table:2.optimization}
+  \begin{tabular}{ll}\hline
+    入力例 & 出力例 \\ \hline
+    \verb|$\Maximize{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]$| & \subjref{fig:2.optimization}{図}の (P1) の後\\
+    \verb|$\Minimize{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]$| & \subjref{fig:2.optimization}{図}の (P2) の後\\
+    \verb|$\Max{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]$| & \subjref{fig:2.optimization}{図}の (P3) の後\\
+    \verb|$\Min{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]$| & \subjref{fig:2.optimization}{図}の (P4) の後\\
+    \verb|$\Supremize{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]$| & \subjref{fig:2.optimization}{図}の (P5) の後\\
+    \verb|$\Infimize{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]$| & \subjref{fig:2.optimization}{図}の (P6) の後\\\hline
+  \end{tabular}
+\end{table}\par
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}{0.4\columnwidth}
+    (P1)\Maximize{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]\par
+    (P2)\Minimize{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]\par
+    (P3)\Max{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]\par
+  \end{minipage}
+  \begin{minipage}{0.4\columnwidth}
+    (P4)\Min{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]\par
+    (P5)\Supremize{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]\par
+    (P6)\Infimize{f(x)}[{&g(x) \le 0, \\ &h(x) = 0}]\par
+  \end{minipage}
+  \caption{最適化のタブロー}
+  \label{fig:2.optimization}
+\end{figure}
+\par
+私は最適化の畑の人間ではないため，これらはあまり使っていません．\Cname{max}，\Cname{min}はそれぞれ$\max$，$\min$の出力に使用されているため，(P3)や(P4)を出力するときはキャピタライズした\Cname{Max}や\Cname{Min}で出力するように指定しています．\par
+また，「max--maximize」の関係における「sup」や「inf」の対応物を知らなかったので，「supremize」と「infimize」という造語でコマンド名を定義しています\footnote{正しい英単語をご存知の方は教えてくださると嬉しいです．}．\par
+なお，\subjref{fig:2.optimization}{図}では，例えば「(P1)」と「Maximize」の間に縦線が引かれていますが，この部分からが\Cname{Maximize}の出力です．また，条件式の部分はオプション引数扱いです．したがって，\verb|\Maximize{f(x)}|とだけ入力すると，次のような出力を得ます．:
+\begin{flushleft}
+  \Maximize{f(x)}
+\end{flushleft}
+
+
+\begin{thebibliography}{99}
+  \bibitem{oct-kanbun} tobetakoyaki/juuhasshiryaku: 漢文ゼミの発表資料, github,\par
+  URL: \url{https://github.com/tobetakoyaki/juuhasshiryaku}.
+  \bibitem{geometry} CTAN: Package geometry, \par
+  URL: \url{https://ctan.org/pkg/geometry}.
+  \bibitem{xparse} CTAN: Package xparse, \par
+  URL: \url{https://www.ctan.org/pkg/xparse}.
+  \bibitem{url} CTAN: Package url, \par
+  URL: \url{https://www.ctan.org/pkg/url}.
+  \bibitem{hyperref} CTAN: Package hyperref, \par
+  URL: \url{https://www.ctan.org/pkg/hyperref}.
+  \bibitem{pxjahyper} CTAN: Package pxjahyper, \par
+  URL: \url{https://ctan.org/pkg/pxjahyper}.
+  \bibitem{amsmath} CTAN: Package amsmath, \par
+  URL: \url{https://www.ctan.org/pkg/amsmath}.
+  \bibitem{amsfonts} CTAN: Package amsfonts, \par
+  URL: \url{https://www.ctan.org/pkg/amsfonts}.
+  \bibitem{Detexify} Detexify LaTeX handwritten symbol recognition, \par
+  \url{http://detexify.kirelabs.org/classify.html}.
+  \bibitem{bm} CTAN: Package bm, \par
+  URL: \url{https://www.ctan.org/pkg/bm}.
+  \bibitem{fancybox} CTAN: Package fancybox, \par
+  URL: \url{https://ctan.org/pkg/fancybox}.
+  \bibitem{ascmac} CTAN: Package ascmac, \par
+  URL: \url{https://www.ctan.org/pkg/ascmac}.
+  \bibitem{graphicx} CTAN: Package graphicx, \par
+  URL: \url{https://www.ctan.org/pkg/graphicx}.
+  \bibitem{xcolor} CTAN: Package xcolor, \par
+  URL: \url{https://www.ctan.org/pkg/xcolor}.
+  \bibitem{pgf} CTAN: Package pgf, \par
+  URL: \url{https://www.ctan.org/pkg/pgf}.
+  \bibitem{mdframed} CTAN: Package mdframed, \par
+  URL: \url{https://www.ctan.org/pkg/mdframed}.
+  \bibitem{pxpgfmark} CTAN: Package pxpgfmark, \par
+  URL: \url{https://www.ctan.org/pkg/pxpgfmark}.
+  \bibitem{array} CTAN: Package array, \par
+  URL: \url{https://www.ctan.org/pkg/array}.
+  \bibitem{booktabs} CTAN: Package booktabs, \par
+  URL: \url{https://www.ctan.org/pkg/booktabs}.
+  \bibitem{multirow} CTAN: Package multirow, \par
+  URL: \url{https://ctan.org/pkg/multirow}.
+  \bibitem{amsthm} CTAN: Package amsthm, \par
+  URL: \url{https://www.ctan.org/pkg/amsthm}.
+  \bibitem{caption} CTAN: Package caption, \par
+  URL: \url{https://www.ctan.org/pkg/caption}.
+  \bibitem{algorithms} CTAN: Package algorithms, \par
+  URL: \url{https://www.ctan.org/pkg/algorithms}.
+  \bibitem{algorithmicx} CTAN: Package algorithmicx, \par
+  URL: \url{https://www.ctan.org/pkg/algorithmicx}.
+  \bibitem{soma} TikZ --- Tasuku Soma's webpage, \par
+  URL: \url{https://www.opt.mist.i.u-tokyo.ac.jp/~tasuku/tikz.html}.
+  \bibitem{ISO80000-2} Quantities and units --- Part 2: Mathematical signs and symbols to be used in the natural sciences and technology, \textit{International Organization for Standardization}, 2009.
+  \bibitem{JISZ8201} JIS Z 8201 数学記号, 日本産業規格, 1981．(閲覧日: 2020年7月30日)
+  \bibitem{nihonbutsuri} 日本物理学会誌投稿規定，日本物理学会，2002 (2019年改訂)．(閲覧日: 2020年7月30日)
+  \bibitem{gfngfn-set} 有名な集合 - LaTeXコードを高い保守性の下で記述する例, \par
+  URL: \url{https://qiita.com/gfngfn/items/cb76cf01c372b7ccb4a9}.
+\end{thebibliography}
+\end{document}
