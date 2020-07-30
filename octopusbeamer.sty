@@ -1,0 +1,67 @@
+\ProvidesPackage{octopusbeamer}
+
+%%%%%%%%%% パッケージ関連 %%%%%%%%%%
+% Beamer用 
+\usepackage{bxdpx-beamer}  % ナビゲーションシンボルを機能させる (cf. https://zrbabbler.hatenablog.com/entry/20130221/1361455788)
+\usefonttheme{professionalfonts} %プロのフォント
+\renewcommand{\kanjifamilydefault}{\gtdefault} % 和文既定をゴシックに変更
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[page number]
+\setbeamerfont{footline}{size=\normalsize}
+
+% 複数ページに跨がる場合に(1/3)表示を出す
+\newcounter{octopusb@framecont}
+\setbeamertemplate{frametitle continuation}{%
+    \setcounter{octopusb@framecont}{\beamer@endpageofframe}%
+    \addtocounter{octopusb@framecont}{1}%
+    \addtocounter{octopusb@framecont}{-\beamer@startpageofframe}%
+    (\insertcontinuationcount/\arabic{octopusb@framecont})%
+}
+
+% 数学フォント生成
+\usepackage{amsmath,amssymb,amsfonts}
+% ベクトル太字:\bm{a}
+\usepackage{bm}
+% タイトル付きの枠生成
+\usepackage{fancybox,ascmac}
+% 図の挿入，普通枠生成
+% \usepackage[dvipdfmx, x11names, table]{xcolor}
+\usepackage{tikz}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{pxpgfmark}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning} % 吹き出しに必要
+\usetikzlibrary{shapes.callouts} % 吹き出しに必要
+% 表の挿入
+\usepackage{array,booktabs}
+\usepackage{multirow}
+% 定理
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{theo}{定理}[section]
+\newtheorem{defi}[theo]{定義}
+\newtheorem{lem}[theo]{補題}
+\newtheorem{prop}[theo]{命題}
+\newtheorem{cor}[theo]{系}
+\newtheorem{exam}[theo]{例}
+\renewcommand{\proofname}{\textsf{証明}}
+% caption
+\usepackage{caption}
+\DeclareCaptionLabelSeparator{periodspace}{.\ }
+\captionsetup{labelfont=bf,labelsep=periodspace}
+\captionsetup[plain]{labelfont=bf,labelsep=periodspace}
+\captionsetup[boxed]{labelfont=bf,labelsep=periodspace}
+\captionsetup[ruled]{labelfont=bf,labelsep=periodspace}
+% アルゴリズム記述
+\usepackage[section]{algorithm}
+\usepackage[noend]{algpseudocode}
+\renewcommand{\ALG@name}{アルゴリズム}
+\renewcommand{\Return}{\State \textbf{return }}
+% URL
+\usepackage{url}
+% リンク・和文メトリックの調整 cf. https://zrbabbler.hatenablog.com/entry/20120528/1338221936
+\usepackage{hyperref}
+\usepackage{pxjahyper}     % しおりの文字化け対策
+
+% コマンド呼出
+\usepackage{octopuscommand}

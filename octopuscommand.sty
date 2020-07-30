@@ -1,0 +1,208 @@
+\ProvidesPackage{octopuscommand}
+
+%%%%%%%%%% コマンド %%%%%%%%%%
+%%% 文章用
+% タイトル
+\newcommand{\minititle}[2]{% ミニサイズタイトル \minititle{タイトル}{コメント}
+	\begin{center}{\LARGE \textbf{#1}}\par #2 \end{center}
+  \begin{flushright}{ト部蛸焼 (@tobetakoyaki)\par}\end{flushright}\par
+}
+\newcommand{\fulltitle}[2]{% フルページタイトル \fulltitle{タイトル}{提出日}
+	\vspace*{13\baselineskip}
+	\begin{center} \textbf{\HUGE #1}\par\vspace{0.5\baselineskip}{\Large #2} \end{center}
+	\vfill
+	\begin{flushright}{\LARGE ト部蛸焼 (@tobetakoyaki)\par}\end{flushright}
+	\thispagestyle{empty}
+	\setcounter{page}{0}
+	\newpage
+}
+% 本文装飾
+\NewDocumentCommand{\textred}{m}{\textcolor{red}{#1}}
+\NewDocumentCommand{\textblue}{m}{\textcolor{blue}{#1}}
+\NewDocumentCommand{\textgreen}{m}{\textcolor{Green4}{#1}}
+\NewDocumentCommand{\textorange}{m}{\textcolor{DarkOrange1}{#1}}
+% 見出し
+\newcommand{\midashi}[1]{\par\noindent\textbf{#1}\par}
+\newcommand{\omidashi}[1]{\par\vspace{\baselineskip}\noindent\textbf{\large #1}\par}
+% 新語
+\NewDocumentCommand{\nw}{mo}{ \textbf{#1}\IfValueT{#2}{ (\textbf{#2})} }
+% 一行分の隙間
+\newcommand{\sukima}{\vspace{\baselineskip}}
+% 定義等の参照
+\newcommand{\subjref}[2]{\textbf{#2\ref{#1}}}
+% 式のハイライトと吹き出し % cf.\url{https://www.opt.mist.i.u-tokyo.ac.jp/~tasuku/tikz.html} + 改変
+\NewDocumentCommand{\highlight}{O{red}mo}{%
+  \tikz[baseline=(x.base)]{%
+    \IfValueTF{#3}{% True 
+      \node[rectangle, rounded corners, fill=#1!10](x){#2} node[below=0em of x, color=#1]{#3};%
+    }{% False 
+      \node[rectangle, rounded corners, fill=#1!10](x){#2};%
+    }%
+  }%
+}%
+\NewDocumentCommand{\calloutset}{mm}{% #1 = callout_name #2 = callout-ed_text
+  \tikz[baseline=(#1.base), remember picture]{%
+    \node (#1){#2};%
+  }%
+}%
+\NewDocumentCommand{\calloutwrite}{mm}{% #1 = callout_name #2 = callout_text
+  \tikz[remember picture, overlay]{%
+    \node[%
+      rectangle callout,%
+      rounded corners,%
+      draw=blue,
+      fill=blue!10,%
+      callout absolute pointer={(#1.north)},%
+      above=of #1,%
+      align=center%
+    ]{%
+      #2%
+    };%
+  }%
+}%
+% TikZ
+\newcommand{\midwayarrow}[3][black]{% 中間矢印付き線分 \midwayarrow[線色（未指定の場合は黒）]{(1点目の座標)}{(2点目の座標)} で (1点目) ->- (2点目）
+	\draw[-latex,#1] #2 -- ($#2!0.6!#3$);
+	\draw[#1] ($#2!0.41!#3$) -- #3;
+}%
+\newcommand{\point}[3]{% 名前付き点 \point{(点の座標)}{文字の位置}{文字内容}
+	#1 node[#2]{#3} circle [radius=0.05]
+}%
+
+
+%%% 数式用コマンド
+% 定義
+\newcommand{\defines}{\overset{\text{def}}{\iff}}
+
+% 定数
+\newcommand{\conste}{\mathrm{e}}
+\newcommand{\consti}{\mathrm{i}}
+\newcommand{\constpi}{\mathrm{\pi}}
+
+% 集合記法
+\NewDocumentCommand{\set}{mo}{% 
+  \left\{ #1%
+  \IfValueT{#2}{%
+    \mathrel{} \middle| \begin{aligned}#2\end{aligned}%
+  }%
+  \right\}%
+}%
+%% 流儀切替 %%%%% cf. https://qiita.com/gfngfn/items/cb76cf01c372b7ccb4a9
+\def\usebbset{\def\setcapital##1{\mathbb{##1}}}
+\def\usebfset{\def\setcapital##1{\mathbf{##1}}}
+\usebbset
+\NewDocumentCommand{\setC}{}{\setcapital{C}}
+\NewDocumentCommand{\setF}{o}{\setcapital{F}\IfValueT{#1}{_{#1}}}
+\NewDocumentCommand{\setH}{}{\setcapital{H}}
+\NewDocumentCommand{\setN}{o}{\setcapital{N}\IfValueT{#1}{_{#1}}}
+\NewDocumentCommand{\setP}{}{\setcapital{P}}
+\NewDocumentCommand{\setQ}{o}{\setcapital{Q}\IfValueT{#1}{_{#1}}}
+\NewDocumentCommand{\setR}{o}{\setcapital{R}\IfValueT{#1}{_{#1}}}
+\NewDocumentCommand{\setZ}{o}{\setcapital{Z}\IfValueT{#1}{_{#1}}}
+
+% 写像や演算子
+\NewDocumentCommand{\abs}{m}{\left| #1 \right|}%
+\NewDocumentCommand{\ceiling}{m}{\left\lceil #1 \right\rceil}%
+\NewDocumentCommand{\floor}{m}{\left\lfloor #1 \right\rfloor}%
+\NewDocumentCommand{\innerproduct}{mm}{\left\langle #1,\,#2\right\rangle}%
+\NewDocumentCommand{\norm}{m}{\left\| #1 \right\|}%
+\NewDocumentCommand{\randchosen}{O{R}}{\overset{\mathsf{#1}}{\leftarrow}}
+\DeclareMathOperator{\conv}{conv}%
+\DeclareMathOperator{\diag}{diag}%
+\DeclareMathOperator{\Dec}{Dec}%
+\DeclareMathOperator{\Enc}{Enc}%
+\DeclareMathOperator{\GL}{GL}%
+\DeclareMathOperator{\Image}{Im}%
+\DeclareMathOperator{\Kernel}{Ker}%
+\DeclareMathOperator{\len}{len}%
+\DeclareMathOperator{\Map}{Map}%
+\DeclareMathOperator{\ord}{ord}%
+\DeclareMathOperator{\ordO}{O}%
+\DeclareMathOperator{\ordo}{o}%
+\DeclareMathOperator{\ordOtilde}{\tilde{O}}%
+\DeclareMathOperator{\ordTheta}{\Theta}%
+\DeclareMathOperator{\ordtheta}{\theta}%
+\DeclareMathOperator{\ordOmega}{\Omega}%
+\DeclareMathOperator{\ordomega}{\omega}%
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator{\Trace}{Tr}
+
+\newcommand{\vin}{\rotatebox{90}{$\in$}}
+\newcommand{\mapdef}[4]{% \mapdef{domainset}{rangeset}{domainelement}{rangeelement}
+	\hspace{5pt}
+	\begin{array}{c@{\:}c@{\:}c}
+		#1   & \longrightarrow & #2   \\
+		\vin &                 & \vin \\
+		#3   & \longmapsto     & #4
+	\end{array}
+}
+\newcommand{\maprestrict}[2]{\left. #1 \right|_{#2}}% 制限写像 \maprestrict{f}{A} で f を A に制限した写像
+
+% 矢線ベクトル
+\newcommand{\vect}[1]{\overrightarrow{#1}}
+
+% 極限，微分，全微分，外積
+\newcommand{\limit}[1]{\xrightarrow[#1]{}}
+\newcommand{\odif}[2]{\dfrac{\mathrm{d}#1}{\mathrm{d}#2}}
+\newcommand{\pdif}[2]{\dfrac{\partial #1}{\partial #2}}
+\newcommand{\pddif}[3]{\dfrac{\partial^{2} #1}{\partial #2 \partial #3}}
+\newcommand{\dx}[1]{\,\mathrm{d}#1}
+\newcommand{\dxy}[2]{\,\mathrm{d}#1 \wedge \mathrm{d}#2}
+\newcommand{\dxyz}[3]{\,\mathrm{d}#1 \wedge \mathrm{d}#2 \wedge \mathrm{d}#3}
+
+% 確率論
+% \NewDocumentCommand{\relmiddle}{m}{\mathrel{}\middle#1\mathrel{}} % cf. https://tex.stackexchange.com/questions/5502/how-to-get-a-mid-binary-relation-that-grows
+% \NewDocumentCommand{\sepverticalline}{}{\relmiddle|} % ここまでの2行分は下の2つを定義するために使うつもりだったものの余白の都合で使わなくなったもの
+\NewDocumentCommand{\prob}{omo}{
+	\Pr \IfValueT{#1}{_{#1}} \left[ #2%
+	\IfValueT{#3}{%
+		\mathrel{} \middle| \begin{aligned}#3\end{aligned}%
+	}%
+	\right]%
+}%
+\NewDocumentCommand{\expe}{omo}{
+	E \IfValueT{#1}{_{#1}} \left[ #2%
+	\IfValueT{#3}{%
+		\mathrel{} \middle| \begin{aligned}#3\end{aligned}%
+	}%
+	\right]%
+}%
+
+% 最適化 % 出典を忘却しました
+\newdimen{\octopus@condwidth}
+\NewDocumentCommand{\Minimize}{mo}{\octopus@opttableau{#1}[#2]{Minimize}}
+\NewDocumentCommand{\Maximize}{mo}{\octopus@opttableau{#1}[#2]{Maximize}}
+\NewDocumentCommand{\Min}{mo}{\octopus@opttableaushorten{#1}[#2]{min.}}
+\NewDocumentCommand{\Max}{mo}{\octopus@opttableaushorten{#1}[#2]{max.}}
+\NewDocumentCommand{\Supremize}{mo}{\octopus@opttableaushorten{#1}[#2]{sup}}
+\NewDocumentCommand{\Infimize}{mo}{\octopus@opttableaushorten{#1}[#2]{inf}}
+
+\NewDocumentCommand{\octopus@opttableau}{mom}{
+  \settowidth{\octopus@condwidth}{$\begin{aligned}#2\end{aligned}$}\;%
+  $\left|%
+  \begin{tabular}{ll}%
+    #3 & $\displaystyle #1$%
+    \IfValueT{#2}{%
+      \\%
+      subject to & \parbox[t]{\octopus@condwidth}{%
+        $\begin{aligned}[t] #2 \end{aligned}$%
+      }%
+    }%
+  \end{tabular}%
+  \right.$%
+}%
+\NewDocumentCommand{\octopus@opttableaushorten}{mom}{%
+  \settowidth{\octopus@condwidth}{$\begin{aligned}#2\end{aligned}$}\;%
+  $\left|%
+  \begin{tabular}{cl}%
+    #3 & $\displaystyle #1$%
+    \IfValueT{#2}{%
+      \\%
+      s.t. & \parbox[t]{\octopus@condwidth}{%
+        $\begin{aligned}[t] #2 \end{aligned}$%
+      }%
+    }%
+  \end{tabular}%
+  \right.$%
+}%

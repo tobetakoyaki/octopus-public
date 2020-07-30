@@ -1,0 +1,68 @@
+\ProvidesPackage{octopus}
+
+%%%%%%%%%% パッケージ関連 %%%%%%%%%%
+% 余白切替
+\usepackage[top=20truemm,bottom=20truemm,left=20truemm,right=20truemm]{geometry}
+% 自在なコマンド定義
+\usepackage{xparse}
+% 数学フォント生成
+\usepackage{amsmath,amssymb,amsfonts}
+% ベクトル太字:\bm{a}
+\usepackage{bm}
+% タイトル付きの枠生成
+\usepackage{fancybox,ascmac}
+% 図の挿入，普通枠生成
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[dvipdfmx, x11names, table]{xcolor}
+\usepackage{tikz}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{pxpgfmark}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning} % 吹き出しに必要
+\usetikzlibrary{shapes.callouts} % 吹き出しに必要
+% 表の挿入
+\usepackage{array,booktabs}
+\usepackage{multirow}
+% 定理
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{theo}{定理}[section]
+\newtheorem{defi}[theo]{定義}
+\newtheorem{lem}[theo]{補題}
+\newtheorem{prop}[theo]{命題}
+\newtheorem{cor}[theo]{系}
+\newtheorem{exam}[theo]{例}
+\renewcommand{\proofname}{\textsf{証明}}
+\surroundwithmdframed[innertopmargin=0pt]{defi}
+\surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{theo}
+\surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{lem}
+\surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{prop}
+\surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{cor}
+% caption
+\usepackage{caption}
+\DeclareCaptionLabelSeparator{periodspace}{.\ }
+\captionsetup{labelfont=bf,labelsep=periodspace}
+\captionsetup[plain]{labelfont=bf,labelsep=periodspace}
+\captionsetup[boxed]{labelfont=bf,labelsep=periodspace}
+\captionsetup[ruled]{labelfont=bf,labelsep=periodspace}
+% アルゴリズム記述
+\usepackage[section]{algorithm}
+\usepackage[noend]{algpseudocode}
+\renewcommand{\ALG@name}{アルゴリズム}
+\renewcommand{\Return}{\State \textbf{return }}
+% URL
+\usepackage{url}
+% リンク・和文メトリックの調整 cf. https://zrbabbler.hatenablog.com/entry/20120528/1338221936
+\usepackage[dvipdfmx]{hyperref}
+\usepackage{pxjahyper}     % しおりの文字化け対策
+\hypersetup{% 
+  setpagesize=false,% ページサイズを設定をoff
+  bookmarksnumbered=true,% ``If Acrobat bookmarks are requested, include section numbers.'' (cited from Manual on CTAN)
+  bookmarksopen=true,% ``If Acrobat bookmarks are requested, show them with all the subtrees expanded.'' (cited from Manual on CTAN)
+  colorlinks=true,% リンク部分に着色
+  linkcolor=black,%
+  citecolor=blue,%
+}%
+
+% コマンド呼出
+\usepackage{octopuscommand}

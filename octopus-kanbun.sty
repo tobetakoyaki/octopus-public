@@ -1,0 +1,79 @@
+%%%%% \documentclass[a4j,landscape,twocolumn]{tarticle} を前提
+
+\ProvidesPackage{octopus-kanbun}
+
+%%%%%%%%%% パッケージ関連 %%%%%%%%%%
+% 漢文訓点
+\usepackage{sfkanbun}
+% 利用文字の拡張
+\usepackage{otf}
+% 図の挿入
+\usepackage[dvipdfmx]{graphicx,xcolor}
+% 用紙の回転
+\usepackage{bounddvi}
+% URL
+\usepackage{url}
+% 行間の部分的変更
+\usepackage{setspace}
+
+%%%%%%%%%% 用紙設定 %%%%%%%%%%
+\textheight=750pt
+\textwidth=54zw
+\marginparsep=3zw
+\headsep=-5pt
+\hoffset=-35pt
+
+%%%%%%%%%% 訓点定義 %%%%%%%%%%
+\def\ninojiten{%
+　\kern-1zw%全角空白
+\raise.2zw\hbox to1zw{\smash{\kern-.1zw\hbox to0zw{\UTF{303B}}}}
+\kern-.5zw}
+\newcommand{\okuri}[3][]{\kundoku{#2}{#1}{#3}{}}            % 送り仮名
+\newcommand{\furi}[2]{\kundoku{#2}{#1}{}{}}                 % 振り仮名
+\newcommand{\re}[3][]{\kundoku{#2}{#1}{#3}{レ}}             % レ点
+\newcommand{\ichire}[3][]{\kundoku{#2}{#1}{#3}{\ichireten}} % 一レ点
+\newcommand{\ichi}[3][]{\kundoku{#2}{#1}{#3}{一}}           % 一・二点 (一)
+\renewcommand{\ni}[3][]{\kundoku{#2}{#1}{#3}{二}}           % 一・二点 (二)
+\newcommand{\san}[3][]{\kundoku{#2}{#1}{#3}{三}}            % 一・二点 (三)
+\newcommand{\ue}[3][]{\kundoku{#2}{#1}{#3}{上}}             % 上中下点 (上)
+\newcommand{\naka}[3][]{\kundoku{#2}{#1}{#3}{中}}           % 上中下点 (中)
+\newcommand{\shita}[3][]{\kundoku{#2}{#1}{#3}{下}}          % 上中下点 (下)
+\newcommand{\uere}[3][]{\kundoku{#2}{#1}{#3}{\uereten}}     % 上レ点
+\newcommand{\NI}[3][]{\kundoku{#2}{#1}{#3}{\ongofu{二}{---}}} % 一・二点 (二|)
+\newcommand{\SAN}[3][]{\kundoku{#2}{#1}{#3}{\ongofu{三}{---}}} % 一・二点 (三|)
+
+%%%%%%%%%% 文章書式定義 %%%%%%%%%%
+% 基本
+\newcommand{\midashi}[1]{\noindent\textbf{#1}}
+\newcommand{\sukima}{\vspace{\baselineskip}}
+
+\newcommand{\yaku}[1]{\begin{quote}{\small \textgt{訳}\hspace{1zw}#1}\end{quote}}
+\newcommand{\tref}[1]{\rensuji{\ref{#1}}}
+\renewcommand{\thesubsection}{\rensuji{\arabic{section}.\arabic{subsection}}}
+% 行間
+\renewcommand{\baselinestretch}{1.3}
+% 文章番号
+\newcounter{sentence}[section]
+\newcommand{\sent}{\vspace{\baselineskip}\noindent\refstepcounter{sentence}\textbf{\rensuji{\thesentence}\rotatebox{90}{.}\quad}}
+% 着色
+\newcommand{\textred}[1]{\textcolor{red}{#1}}
+\newcommand{\textblue}[1]{\textcolor{blue}{#1}}
+\newcommand{\textgreen}[1]{\textcolor{green!50!black}{#1}}
+% 中央線を引く（二段組）
+\setlength{\columnseprule}{0.3mm}
+% 注の書式
+\newcommand{\chuuskip}{\hspace{0.5zw}}
+\newcommand{\footnotekanbun}[2]{\footnote{\textbf{#1}\hspace{1zw}#2}}
+
+% 参考文献の番号を，連数字を利用したものに変更
+\def\@cite#1#2{\rensuji{[{#1\if@tempswa , #2\fi}]}}%%
+\def\@biblabel#1{\rensuji{[#1]}}%%%
+% 傍線の位置を少し右に変更
+\renewcommand\kasen[1]{%
+  \ifydir\underline{#1}%
+  \else\if@rotsw\underline{#1}\else
+    \setbox\z@\hbox{#1}\leavevmode\raise1.2zw 
+    \hbox to\z@{\vrule\@width\wd\z@ \@depth\z@ \@height.4\p@\hss}%
+    \box\z@
+\fi\fi}
+% end of file
