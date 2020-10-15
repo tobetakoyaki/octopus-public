@@ -5,6 +5,17 @@
 \usepackage[top=20truemm,bottom=20truemm,left=20truemm,right=20truemm]{geometry}
 % 自在なコマンド定義
 \usepackage{xparse}
+% リンク・和文メトリックの調整 cf. https://zrbabbler.hatenablog.com/entry/20120528/1338221936
+\usepackage[dvipdfmx]{hyperref}
+\usepackage{pxjahyper}     % しおりの文字化け対策
+\hypersetup{% 
+  setpagesize=false,% ページサイズを設定をoff
+  bookmarksnumbered=true,% ``If Acrobat bookmarks are requested, include section numbers.'' (cited from Manual on CTAN)
+  bookmarksopen=true,% ``If Acrobat bookmarks are requested, show them with all the subtrees expanded.'' (cited from Manual on CTAN)
+  colorlinks=true,% リンク部分に着色
+  linkcolor=black,%
+  citecolor=blue,%
+}%
 % 数学フォント生成
 \usepackage{amsmath,amssymb,amsfonts}
 % ベクトル太字:\bm{a}
@@ -15,29 +26,99 @@
 \usepackage[dvipdfmx]{graphicx}
 \usepackage[dvipdfmx, x11names, table]{xcolor}
 \usepackage{tikz}
-\usepackage[framemethod=tikz]{mdframed}
-\usepackage{pxpgfmark}
 \usetikzlibrary{calc}
 \usetikzlibrary{positioning} % 吹き出しに必要
 \usetikzlibrary{shapes.callouts} % 吹き出しに必要
+\usepackage{pxpgfmark}
+% \usepackage[framemethod=tikz]{mdframed}
+\usepackage[breakable, skins, theorems, listingsutf8]{tcolorbox} % 自在な枠生成
+\usepackage{plistings} % enhance listings.sty for use of Japanese
 % 表の挿入
 \usepackage{array,booktabs}
 \usepackage{multirow}
 % 定理
-\usepackage{amsthm}
-\theoremstyle{definition}
-\newtheorem{theo}{定理}[section]
-\newtheorem{defi}[theo]{定義}
-\newtheorem{lem}[theo]{補題}
-\newtheorem{prop}[theo]{命題}
-\newtheorem{cor}[theo]{系}
-\newtheorem{exam}[theo]{例}
-\renewcommand{\proofname}{\textsf{証明}}
-\surroundwithmdframed[innertopmargin=0pt]{defi}
-\surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{theo}
-\surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{lem}
-\surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{prop}
-\surroundwithmdframed[roundcorner=10pt,innertopmargin=0pt]{cor}
+\newcounter{octopus@theorem}
+\numberwithin{octopus@theorem}{section}
+\newtcolorbox{octopus@theobox}[1][]{%
+	colback=white,colbacktitle=white,%
+	colframe=black,coltitle=black,%
+	fonttitle=\bfseries,%
+	left=0.5em,right=0.5em,top=0.25em,bottom=0.25em,%
+	before skip=10pt,after skip=5pt,%
+  before upper={\parindent1zw},#1%  
+}
+\newtcolorbox{octopus@exam}[1][]{%
+	blanker,breakable,left=1em,%
+	before skip=0pt,after skip=15pt,%
+	borderline west={1.5pt}{0pt}{black},%
+	before upper={\parindent1zw},#1%
+}
+\NewDocumentEnvironment{theo}{o}{%
+	\refstepcounter{octopus@theorem}
+	\begin{octopus@theobox}[title=定理~\theoctopus@theorem%
+	\IfValueT{#1}{. (#1)}]
+}{%
+	\end{octopus@theobox}
+}
+\NewDocumentEnvironment{defi}{o}{%
+	\refstepcounter{octopus@theorem}
+	\begin{octopus@theobox}[arc=0pt,title=定義~\theoctopus@theorem%
+	\IfValueT{#1}{. (#1)}]
+}{%
+	\end{octopus@theobox}
+}
+\NewDocumentEnvironment{lem}{o}{%
+	\refstepcounter{octopus@theorem}
+	\begin{octopus@theobox}[title=補題~\theoctopus@theorem%
+	\IfValueT{#1}{. (#1)}]
+}{%
+	\end{octopus@theobox}
+}
+\NewDocumentEnvironment{prop}{o}{%
+	\refstepcounter{octopus@theorem}
+	\begin{octopus@theobox}[title=命題~\theoctopus@theorem%
+	\IfValueT{#1}{. (#1)}]
+}{%
+	\end{octopus@theobox}
+}
+\NewDocumentEnvironment{cor}{o}{%
+	\refstepcounter{octopus@theorem}
+	\begin{octopus@theobox}[title=系~\theoctopus@theorem%
+	\IfValueT{#1}{. (#1)}]
+}{%
+	\end{octopus@theobox}
+}
+\NewDocumentEnvironment{exam}{o}{%
+	\refstepcounter{octopus@theorem}
+	\tcbox[%
+		tcbox raise base,%
+		colback=white,colbacktitle=white,%
+		colframe=black,coltitle=black,%
+		left=1pt,right=1pt,top=1pt,bottom=1pt,%
+		before skip=10pt,after skip=5pt%
+	]{\textbf{例~\theoctopus@theorem%
+	\IfValueT{#1}{. (#1)}}}
+	\begin{octopus@exam}
+}{%
+	\end{octopus@exam}
+}
+\NewDocumentEnvironment{remark}{}{%
+  \begin{octopus@exam}[title={注意.},fonttitle=\bfseries,coltitle=black]%
+}{%
+  \end{octopus@exam}%
+}
+\newtcolorbox{proof}{% 証明
+	blanker,breakable,left=1.5em,
+	before skip=10pt,after skip=15pt,
+	borderline west={2.5pt}{0pt}{red},
+	before upper={\textbf{証明.}~\parindent1zw},
+	after upper={\hfill\tikz[xscale=0.25,yscale=0.25]{\filldraw (0,0)--(1,0)--(1,1)--(0,1)--cycle;}}
+}
+\newtcolorbox{subproof}{% proof環境内でちょっとした証明を記述
+	blanker,breakable,left=2em,%
+	before skip=5pt,after skip=7.5pt,%
+	borderline west={2.5pt}{10pt}{gray}%
+}
 % caption
 \usepackage{caption}
 \DeclareCaptionLabelSeparator{periodspace}{.\ }
@@ -52,17 +133,5 @@
 \renewcommand{\Return}{\State \textbf{return }}
 % URL
 \usepackage{url}
-% リンク・和文メトリックの調整 cf. https://zrbabbler.hatenablog.com/entry/20120528/1338221936
-\usepackage[dvipdfmx]{hyperref}
-\usepackage{pxjahyper}     % しおりの文字化け対策
-\hypersetup{% 
-  setpagesize=false,% ページサイズを設定をoff
-  bookmarksnumbered=true,% ``If Acrobat bookmarks are requested, include section numbers.'' (cited from Manual on CTAN)
-  bookmarksopen=true,% ``If Acrobat bookmarks are requested, show them with all the subtrees expanded.'' (cited from Manual on CTAN)
-  colorlinks=true,% リンク部分に着色
-  linkcolor=black,%
-  citecolor=blue,%
-}%
-
 % コマンド呼出
 \usepackage{octopuscommand}

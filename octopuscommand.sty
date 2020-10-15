@@ -60,15 +60,105 @@
     };%
   }%
 }%
+% 矢印
+\NewDocumentCommand{\implyingarrow}{O{1}}{%
+  \begin{tikzpicture}[scale=#1, baseline=(x.base)]%
+    \node (x) {};%
+    \filldraw[fill=Blue4,draw=Blue4] (0,0.05) rectangle (0.4,0.25);%
+    \filldraw[fill=Blue4,draw=Blue4] (0.4,-0.05) -- (0.7,0.15) -- (0.4,0.35) -- (0.4,-0.05) -- cycle;%
+  \end{tikzpicture}\hspace{0.5em}%
+}
+\NewDocumentCommand{\implyingdownarrow}{O{1}}{%
+  \begin{tikzpicture}[scale=#1, baseline=(x.base)]%
+    \node (x) at (0,-0.15){};%
+    \filldraw[fill=Blue4,draw=Blue4] (0.1,0.35) rectangle (0.3,-0.05);%
+    \filldraw[fill=Blue4,draw=Blue4] (0,-0.05) -- (0.4,-0.05) -- (0.2,-0.35) -- cycle;%
+  \end{tikzpicture}\hspace{0.25em}%
+}
 % TikZ
 \newcommand{\midwayarrow}[3][black]{% 中間矢印付き線分 \midwayarrow[線色（未指定の場合は黒）]{(1点目の座標)}{(2点目の座標)} で (1点目) ->- (2点目）
-	\draw[-latex,#1] #2 -- ($#2!0.6!#3$);
-	\draw[#1] ($#2!0.41!#3$) -- #3;
+	\draw[-latex,#1] #2 -- ($#2!0.51!#3$);
+	\draw[#1] ($#2!0.46!#3$) -- #3;
 }%
 \newcommand{\point}[3]{% 名前付き点 \point{(点の座標)}{文字の位置}{文字内容}
 	#1 node[#2]{#3} circle [radius=0.05]
 }%
-
+% 枠
+\newtcolorbox{octopus@coloredframe}[1][]{%
+	fonttitle=\bfseries,%
+	left=0.5em,right=0.5em,top=0.25em,bottom=0.25em,%
+	before skip=10pt,after skip=5pt,%
+  before upper={\parindent1zw},#1%
+}
+\NewDocumentEnvironment{octpframewhite}{O{}}{%
+  \begin{octopus@coloredframe}[%
+    colback=white,colbacktitle=white,%
+    colframe=black,coltitle=black,%
+    #1%
+  ]%
+}{\end{octopus@coloredframe}}%
+\NewDocumentEnvironment{octpframered1}{O{}}{%
+  \begin{octopus@coloredframe}[%
+    colback=red!5!white,colframe=red!80!black,%
+    #1%
+  ]%
+}{\end{octopus@coloredframe}}%
+\NewDocumentEnvironment{octpframeblue1}{O{}}{%
+  \begin{octopus@coloredframe}[%
+    colback=blue!5!white,colframe=blue!50!black,%
+    #1%
+  ]%
+}{\end{octopus@coloredframe}}%
+\NewDocumentEnvironment{octpframegreen1}{O{}}{%
+  \begin{octopus@coloredframe}[%
+    colback=green!5!white,colframe=green!50!black,%
+    #1%
+  ]%
+}{\end{octopus@coloredframe}}%
+\NewDocumentEnvironment{octpframegray1}{O{}}{%
+  \begin{octopus@coloredframe}[#1]%
+}{\end{octopus@coloredframe}}%
+\NewDocumentEnvironment{octpframered2}{O{}}{%
+  \begin{octopus@coloredframe}[%
+    colback=white,colframe=red!80!black,%
+    coltitle=black,colbacktitle=red!5!white,%
+    #1%
+  ]%
+}{\end{octopus@coloredframe}}%
+\NewDocumentEnvironment{octpframeblue2}{O{}}{%
+  \begin{octopus@coloredframe}[%
+    colback=white,colframe=blue!50!black,%
+    coltitle=black,colbacktitle=blue!5!white,%
+    #1%
+  ]%
+}{\end{octopus@coloredframe}}%
+\NewDocumentEnvironment{octpframegreen2}{O{}}{%
+  \begin{octopus@coloredframe}[%
+    colback=white,colframe=green!50!black,%
+    coltitle=black,colbacktitle=green!5!white,%
+    #1%
+  ]%
+}{\end{octopus@coloredframe}}%
+\NewDocumentEnvironment{octpframegray2}{O{}}{%
+  \begin{octopus@coloredframe}[%
+    colback=white,%
+    coltitle=black,colbacktitle=black!5!white,%
+    #1]%
+}{\end{octopus@coloredframe}}%
+\newtcblisting{insertcode}[2][]{%%
+  title={\hspace{-1.75em}#2},%
+  left=2.25em,right=0.5em,top=-0.5em,bottom=-0.5em,%
+  before skip=10pt,after skip=10pt,%
+  fonttitle=\bfseries,fontupper={\ttfamily\small},%
+  colback=white,colbacktitle=black!15!white,%
+  colframe=black,coltitle=black,%
+  breakable,enhanced jigsaw,%
+  topsep at break=0.5em,bottomsep at break=0.5em,listing only,%
+  listing options={%
+    lineskip=-0.25em,columns=fixed,basewidth=0.5em,%
+    numbers=left,numberstyle=\ttfamily,#1%
+  }%
+}
 
 %%% 数式用コマンド
 % 定義
@@ -80,10 +170,11 @@
 \newcommand{\constpi}{\mathrm{\pi}}
 
 % 集合記法
-\NewDocumentCommand{\set}{mo}{% 
-  \left\{ #1%
-  \IfValueT{#2}{%
-    \mathrel{} \middle| \begin{aligned}#2\end{aligned}%
+\NewDocumentCommand{\set}{smo}{%
+  \left\{ #2%
+  \IfValueT{#3}{%
+    \mathrel{}\middle|\mathrel{}%
+    \IfBooleanTF{#1}{#3}{\hspace{-5pt}\begin{array}{l}#3\end{array}\hspace{-4pt}}%
   }%
   \right\}%
 }%
@@ -92,26 +183,27 @@
 \def\usebfset{\def\setcapital##1{\mathbf{##1}}}
 \usebbset
 \NewDocumentCommand{\setC}{}{\setcapital{C}}
-\NewDocumentCommand{\setF}{o}{\setcapital{F}\IfValueT{#1}{_{#1}}}
+\NewDocumentCommand{\setF}{}{\setcapital{F}}
 \NewDocumentCommand{\setH}{}{\setcapital{H}}
-\NewDocumentCommand{\setN}{o}{\setcapital{N}\IfValueT{#1}{_{#1}}}
+\NewDocumentCommand{\setN}{}{\setcapital{N}}
 \NewDocumentCommand{\setP}{}{\setcapital{P}}
-\NewDocumentCommand{\setQ}{o}{\setcapital{Q}\IfValueT{#1}{_{#1}}}
-\NewDocumentCommand{\setR}{o}{\setcapital{R}\IfValueT{#1}{_{#1}}}
-\NewDocumentCommand{\setZ}{o}{\setcapital{Z}\IfValueT{#1}{_{#1}}}
+\NewDocumentCommand{\setQ}{}{\setcapital{Q}}
+\NewDocumentCommand{\setR}{}{\setcapital{R}}
+\NewDocumentCommand{\setZ}{}{\setcapital{Z}}
 
 % 写像や演算子
-\NewDocumentCommand{\abs}{m}{\left| #1 \right|}%
-\NewDocumentCommand{\ceiling}{m}{\left\lceil #1 \right\rceil}%
-\NewDocumentCommand{\floor}{m}{\left\lfloor #1 \right\rfloor}%
-\NewDocumentCommand{\innerproduct}{mm}{\left\langle #1,\,#2\right\rangle}%
-\NewDocumentCommand{\norm}{m}{\left\| #1 \right\|}%
+\NewDocumentCommand{\abs}{sm}{\IfBooleanTF{#1}{\lvert#2\rvert}{\left\lvert#2\right\rvert}}%
+\NewDocumentCommand{\ceiling}{sm}{\IfBooleanTF{#1}{\lceil#2\rceil}{\left\lceil#2\right\rceil}}%
+\NewDocumentCommand{\floor}{sm}{\IfBooleanTF{#1}{\lfloor#2\rfloor}{\left\lfloor#2\right\rfloor}}%
+\NewDocumentCommand{\innerproduct}{smm}{\IfBooleanTF{#1}{\langle#2,\,#3\rangle}{\left\langle#2,\,#3\right\rangle}}%
+\NewDocumentCommand{\norm}{sm}{\IfBooleanTF{#1}{\lVert#2\rVert}{\left\lVert#2\right\rVert}}%
 \NewDocumentCommand{\randchosen}{O{R}}{\overset{\mathsf{#1}}{\leftarrow}}
 \DeclareMathOperator{\conv}{conv}%
 \DeclareMathOperator{\diag}{diag}%
 \DeclareMathOperator{\Dec}{Dec}%
 \DeclareMathOperator{\Enc}{Enc}%
 \DeclareMathOperator{\GL}{GL}%
+\DeclareMathOperator{\Hom}{Hom}%
 \DeclareMathOperator{\Image}{Im}%
 \DeclareMathOperator{\Kernel}{Ker}%
 \DeclareMathOperator{\len}{len}%
@@ -154,22 +246,24 @@
 % 確率論
 % \NewDocumentCommand{\relmiddle}{m}{\mathrel{}\middle#1\mathrel{}} % cf. https://tex.stackexchange.com/questions/5502/how-to-get-a-mid-binary-relation-that-grows
 % \NewDocumentCommand{\sepverticalline}{}{\relmiddle|} % ここまでの2行分は下の2つを定義するために使うつもりだったものの余白の都合で使わなくなったもの
-\NewDocumentCommand{\prob}{omo}{
-	\Pr \IfValueT{#1}{_{#1}} \left[ #2%
-	\IfValueT{#3}{%
-		\mathrel{} \middle| \begin{aligned}#3\end{aligned}%
+\NewDocumentCommand{\prob}{somo}{%
+	\Pr \IfValueT{#2}{_{#2}} \left[ #3%
+  \IfValueT{#4}{%
+    \mathrel{}\middle|\mathrel{}%
+    \IfBooleanTF{#1}{#4}{\hspace{-5pt}\begin{array}{l}#4\end{array}\hspace{-4pt}}%
 	}%
 	\right]%
 }%
-\NewDocumentCommand{\expe}{omo}{
-	E \IfValueT{#1}{_{#1}} \left[ #2%
-	\IfValueT{#3}{%
-		\mathrel{} \middle| \begin{aligned}#3\end{aligned}%
+\NewDocumentCommand{\expe}{somo}{%
+	E \IfValueT{#2}{_{#2}} \left[ #3%
+	\IfValueT{#4}{%
+    \mathrel{}\middle|\mathrel{}%
+    \IfBooleanTF{#1}{#4}{\hspace{-5pt}\begin{array}{l}#4\end{array}\hspace{-4pt}}%
 	}%
 	\right]%
-}%
+}
 
-% 最適化 % 出典を忘却しました
+% 最適化
 \newdimen{\octopus@condwidth}
 \NewDocumentCommand{\Minimize}{mo}{\octopus@opttableau{#1}[#2]{Minimize}}
 \NewDocumentCommand{\Maximize}{mo}{\octopus@opttableau{#1}[#2]{Maximize}}
